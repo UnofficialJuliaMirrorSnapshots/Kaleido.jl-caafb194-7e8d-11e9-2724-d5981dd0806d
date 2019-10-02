@@ -35,6 +35,7 @@ end
 _default_show(io, obj) = print_apply(io, typeof(obj), _getfields(obj))
 
 Base.show(io::IO, lens::KaleidoLens) = _default_show(io, lens)
+Base.show(io::IO, ::MIME"text/plain", lens::KaleidoLens) = prettylens(io, lens)
 
 _constructor_of(x) = Setfield.constructor_of(x)
 _constructor_of(::Type{<:NamedTuple{names}}) where names = NamedTuple{names}
@@ -65,6 +66,11 @@ prefer_singleton_callable(f) = f
 
 struct SingletonCallable{T} end
 (::SingletonCallable{T})(x) where T = T(x)
+
+@nospecialize
+_singleton_callable(::SingletonCallable{T}) where T = T
+_singleton_callable(f) = f
+@specialize
 
 ## Specialized foldl
 

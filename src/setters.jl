@@ -1,4 +1,4 @@
-abstract type Setter <: Lens end
+abstract type Setter <: KaleidoLens end
 
 Setfield.get(::Any, setter::Setter) = error("Setters do not support `get`.")
 
@@ -21,6 +21,9 @@ julia> set(1, nullsetter, 2)
 """
 const nullsetter = NullSetter()
 
+Base.show(io::IO, ::NullSetter) = print(io, "nullsetter")
+# TODO: handle prefix
+
 """
     ToField(f) :: Setter
 
@@ -30,7 +33,8 @@ Apply `f` when setting.  Use `x -> get(x, f)` if `f` is a `Lens`.
 ```jldoctest
 julia> using Setfield, Kaleido
 
-julia> setter = (@lens _.x) ∘ ToField(@lens _.a);
+julia> setter = (@lens _.x) ∘ ToField(@lens _.a)
+(@lens _.x) ∘ (←(@lens _.a)|❌→)
 
 julia> set((x = 1, y = 2), setter, (a = 10, b = 20))
 (x = 10, y = 2)
